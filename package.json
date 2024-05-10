@@ -4,10 +4,7 @@
     "description": "",
     "main": "laporan_suhu.js",
     "scripts": {
-      "bot": "nodemon main.js",
-      "monitoring": "nodemon laporan_suhu.js",
-      "wasap": "nodemon bot_whatsapp.js",
-      "zabbix": "nodemon zabbix.js"
+      "monitoring": "nodemon laporan_suhu.js"
     },
     "keywords": [],
     "author": "",
