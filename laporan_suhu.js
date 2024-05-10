@@ -10,7 +10,7 @@ const ENDPOINT_NOC = process.env.ENDPOINT_NOC
 const ENDPOINT_NOC_BACKUP = process.env.ENDPOINT_NOC_BACKUP
 const ENDPOINT_PANEL = process.env.ENDPOINT_PANEL
 
-const chatID = "988675972";
+const chatID = process.env.CHAT_ID
 
 const prefix = '.'
 const ceksuhunoc = new RegExp(`^${prefix}mon`)
