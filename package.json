@@ -1,0 +1,26 @@
+{
+  "name": "pijaroncloud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "laporan_suhu.js",
+  "scripts": {
+    "bot": "nodemon main.js",
+    "monitoring": "nodemon laporan_suhu.js",
+    "wasap": "nodemon bot_whatsapp.js",
+    "zabbix": "nodemon zabbix.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "html2canvas": "^1.4.1",
+    "node-telegram-bot-api": "^0.65.1",
+    "nodemon": "^3.1.0",
+    "puppeteer": "^22.7.1",
+    "sleep": "^6.3.0",
+    "timers-promises": "^1.0.1",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}
