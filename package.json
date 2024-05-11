@@ -4,7 +4,8 @@
     "description": "",
     "main": "laporan_suhu.js",
     "scripts": {
-      "monitoring": "nodemon laporan_suhu.js"
+      "monitoring": "nodemon laporan_suhu.js",
+      "siang": "nodemon monitoring_siang.js"
     },
     "keywords": [],
     "author": "",

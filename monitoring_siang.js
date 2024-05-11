@@ -8,6 +8,7 @@ const bot = new TelegramBot(token, { polling: true });
 const ENDPOINT_NOC = process.env.ENDPOINT_NOC
 const ENDPOINT_NOC_BACKUP = process.env.ENDPOINT_NOC_BACKUP
 const ENDPOINT_PANEL = process.env.ENDPOINT_PANEL
+const urlSuhu = process.env.URL_SUHU_V2
 
 const chatID = process.env.CHAT_ID
 
@@ -36,72 +37,15 @@ var range_report = `${range_hours}:00`
 
 bot.onText(ceksuhunoc, async (msg) => {
 
-  const apiCall_NOC = await fetch(ENDPOINT_NOC)
-  const apiCall_NOC_BACKUP = await fetch(ENDPOINT_NOC_BACKUP)
-  const apiCall_PANEL = await fetch(ENDPOINT_PANEL)
-  const urlSuhu = process.env.URL_SUHU_V2
-
-  let status_noc = "Normal";
-  let status_backup = "Normal";
-  let status_panel = "Normal";
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_NOC.json()
-
-  var noc_temp = temp;
-  var noc_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status_noc = "Offline";
-  }
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_NOC_BACKUP.json()
-  var noc_backup_temp = temp;
-  var noc_backup_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status_backup = "Offline";
-  }
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_PANEL.json()
-  var panel_temp = temp;
-  var panel_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status_panel = "Offline";
-  }
-
-
   const chatId = msg.chat.id;
   const caption = 
-`Assalamualaikum, permisi bpk/ibu , Izin menyampaikan
+`Info Monitoring Server
+${tgl_report}
+${hours}:${minutes} WIB
 
-Info Piket Malam:
-  
-Pengecekan Monitoring Suhu Server MPP 
-Tanggal : ${tgl_report}
-Jam : ${report_hours} - ${range_report}
-
-Monitoring Suhu dan Kelembaban
-                      Temperature Humidity Status
-Ruang NOC        ${noc_temp}c            ${noc_humd}%     ${status_noc}
-NOC (Backup)    ${noc_backup_temp}c            ${noc_backup_humd}%     ${status_backup}
-Ruang Panel      ${panel_temp}c             ${panel_humd}%     ${status_panel
-}
-
-Status Server : Normal
-Terkendali Aman , dan akan terus di Pantau secara berkala 🙏🏻`;
+Status Semua Server Fisik           = Normal
+Status Traffic web aplikasi PTSP = Normal
+Status Suhu/ kelembapan           = Normal`;
 
   console.log("process screenshot suhu...")
 
@@ -203,6 +147,51 @@ bot.on('message', async (msg) => {
   } */
 });
 
+async function sendSuhu() {
+
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+
+  const day = now.getDate();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const year = now.getFullYear();
+
+  var tgl_report = `${day} ${month} ${year}`
+  const urlSuhu = process.env.URL_SUHU_V2
+
+
+  const caption = 
+`Info Monitoring Server
+${tgl_report}
+${hours}:${minutes} WIB
+
+Status Semua Server Fisik           = Normal
+Status Traffic web aplikasi PTSP = Normal
+Status Suhu/ kelembapan           = Normal`;
+
+  console.log("process screenshot suhu...")
+  
+
+  try {
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 800 }); // Set the viewport for desktop size
+    await page.goto(urlSuhu, { waitUntil: 'load' });
+    await sleep(3500);
+    console.log("screenshot monitoring suhu has been sent")
+    console.log(`report in ${hours}:${minutes}`)
+    const screenshot = await page.screenshot({ fullPage: true });
+    await bot.sendPhoto(chatID, screenshot, {caption: caption});
+    await browser.close()
+
+  } catch (error) {
+    bot.sendMessage(chatID, 'Sorry, something went wrong. Please try again.');
+  }
+}
+
+setInterval(sendSuhu, 600000);
+
 async function sendHTTP() {
 
   const browser = await puppeteer.launch();
@@ -229,111 +218,4 @@ async function sendHTTP() {
   
 
 }
-setInterval(sendHTTP, 60000);
-
-async function sendSuhu() {
-
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-
-  const day = now.getDate();
-  const month = now.toLocaleString('default', { month: 'long' });
-  const year = now.getFullYear();
-
-  var tgl_report = `${day} ${month} ${year}`
-
-  if (minutes > 0) {
-    var report_hours = `${hours}:00`
-  }
-  var range_hours = now.getHours() + 1;
-  var range_report = `${range_hours}:00`
-
-  const apiCall_NOC = await fetch(ENDPOINT_NOC)
-  const apiCall_NOC_BACKUP = await fetch(ENDPOINT_NOC_BACKUP)
-  const apiCall_PANEL = await fetch(ENDPOINT_PANEL)
-  const urlSuhu = process.env.URL_SUHU_V2
-
-
-  let status_noc = "Normal";
-  let status_backup = "Normal";
-  let status_panel = "Normal";
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_NOC.json()
-
-  var noc_temp = temp;
-  var noc_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status = "Offline";
-  }
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_NOC_BACKUP.json()
-  var noc_backup_temp = temp;
-  var noc_backup_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status = "Offline";
-  }
-
-  try {
-    const {
-      data : {
-          temp,timeon,humd,id
-  }} = await apiCall_PANEL.json()
-  var panel_temp = temp;
-  var panel_humd = humd;
-  } catch (error) {
-    console.log(error)
-    status = "Offline";
-  }
-
-
-
-  const caption = 
-`Assalamualaikum, permisi bpk/ibu , Izin menyampaikan
-
-Info Piket Malam:
-  
-Pengecekan Monitoring Suhu Server MPP 
-Tanggal : ${tgl_report}
-Jam : ${report_hours} - ${range_report}
-
-Monitoring Suhu dan Kelembaban
-                      Temperature Humidity Status
-Ruang NOC        ${noc_temp}c            ${noc_humd}%     ${status_noc}
-NOC (Backup)    ${noc_backup_temp}c            ${noc_backup_humd}%     ${status_backup}
-Ruang Panel      ${panel_temp}c             ${panel_humd}%     ${status_panel}
-
-Status Server : Normal
-Terkendali Aman , dan akan terus di Pantau secara berkala 🙏🏻`;
-
-  console.log("process screenshot suhu...")
-  
-
-  try {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 800 }); // Set the viewport for desktop size
-    await page.goto(urlSuhu, { waitUntil: 'load' });
-    await sleep(3500);
-    console.log("screenshot monitoring suhu has been sent")
-    console.log(`report in ${hours}:${minutes}`)
-    const screenshot = await page.screenshot({ fullPage: true });
-    await bot.sendPhoto(chatID, screenshot, {caption: caption});
-    await browser.close()
-
-  } catch (error) {
-    bot.sendMessage(chatID, 'Sorry, something went wrong. Please try again.');
-  }
-}
-
-setInterval(sendSuhu, 60000);
+setInterval(sendHTTP, 600000);
