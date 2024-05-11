@@ -95,7 +95,6 @@ bot.on('message', async (msg) => {
     
     const screenshot = await page.screenshot({ fullPage: true });
     bot.sendPhoto(msg.chat.id, screenshot);
-    console.log(msg.chat.id)
     console.log('screenshot httprequest has been sent')
     await browser.close();
   }
